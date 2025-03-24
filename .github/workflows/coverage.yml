@@ -1,0 +1,27 @@
+name: test coverage
+on:
+  push:
+    branches: ['master']
+    paths: ['backend/**']
+  pull_request:
+    branches: ['master']
+    paths: ['backend/**']
+jobs:
+  test:
+    name: coverage
+    runs-on: ubuntu-latest
+    container:
+      image: xd009642/tarpaulin:develop-nightly
+      options: --security-opt seccomp=unconfined
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate code coverage
+        run: |
+          cargo +nightly tarpaulin --verbose --timeout 120
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v5
+        with:
+          fail_ci_if_error: true
+          files: ./coverage/cobertura.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: muhrifqii/dHisStoryGameAI
