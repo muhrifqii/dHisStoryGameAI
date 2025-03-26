@@ -1,5 +1,9 @@
 pub mod prompts {
+    use candid::Principal;
+
     use crate::ollama::{chat, ChatMessage, Role};
+
+    use super::conversations::{get_history, update_history};
 
     const SYSTEM_PROMPT: &'static str = "
     You are an interactive storyteller for a historical event or story, a game with an immersive, branching narrative. Your task is to continue the story based on previous context and the user's decision.
@@ -36,13 +40,12 @@ pub mod prompts {
         history.len() > HISTORY_THRESHOLD
     }
 
-    pub fn build_initial_prompt() -> Vec<ChatMessage> {
+    fn build_initial_prompt() -> Vec<ChatMessage> {
         let intro_instruction = ChatMessage {
             role: Role::assistant,
             content: r#"
-            You should say this sentence
-
-            Welcome to the Historical Adventure Game, dHisStoryGame.AI! In this journey, history meets creativity. Before we begin, please tell me: Are you a real person or a character in a historical event? And which country or city would you prefer to be in?
+            The user want to start the game. You should say this sentence:
+            Welcome to the Historical Adventure Game, dHisStoryGame.AI! In this journey, history meets creativity. Before we begin, please tell me: Are you a real character in the historical event or not? And which country or city would you prefer to be in?
             "#.to_string(),
         };
 
@@ -85,10 +88,7 @@ pub mod prompts {
         messages
     }
 
-    pub async fn continue_conversation(
-        mut history: Vec<ChatMessage>,
-        user_input: &str,
-    ) -> Option<String> {
+    async fn continue_conversation(history: &mut Vec<ChatMessage>, user_input: &str) -> String {
         if history_too_long(&history) {
             let summary = summarize(&history).await;
             history.clear();
@@ -104,10 +104,33 @@ pub mod prompts {
             content: user_input.to_string(),
         });
         history.push(ChatMessage {
-            role: Role::user,
+            role: Role::assistant,
             content: response.clone(),
         });
-        Some(response)
+        response
+    }
+
+    async fn response_for_command(user: &Principal, input: &str) -> Option<String> {
+        match input {
+            "/start" => {
+                if !get_history(user).is_empty() {
+                    update_history(user.clone(), vec![]);
+                }
+                Some(chat(build_initial_prompt()).await)
+            }
+            "/about" => Some("This is an interactive game where historical settings are blended with creative twists, that depends on you to decide. Build on ICP, and it is available at https://github.com/muhrifqii/dHisStoryGameAI".to_string()),
+            _ => None,
+        }
+    }
+
+    pub async fn user_prompt(user: Principal, input: &str) -> String {
+        if let Some(res) = response_for_command(&user, input).await {
+            return res;
+        }
+        let mut history = get_history(&user);
+        let response = continue_conversation(&mut history, input).await;
+        update_history(user, history);
+        response
     }
 
     #[cfg(test)]
@@ -205,12 +228,12 @@ pub mod conversations {
         static CONVERSATION_HISTORIES: RefCell<HashMap<Principal, Vec<ChatMessage>>> = RefCell::new(HashMap::new());
     }
 
-    fn get_history(user: Principal) -> Vec<ChatMessage> {
+    pub fn get_history(user: &Principal) -> Vec<ChatMessage> {
         CONVERSATION_HISTORIES
-            .with_borrow(|histories| histories.get(&user).cloned().unwrap_or_default())
+            .with_borrow(|histories| histories.get(user).cloned().unwrap_or_default())
     }
 
-    fn update_history(user: Principal, history: Vec<ChatMessage>) {
+    pub fn update_history(user: Principal, history: Vec<ChatMessage>) {
         CONVERSATION_HISTORIES.with_borrow_mut(|histories| {
             histories.insert(user, history);
         })
@@ -239,9 +262,9 @@ pub mod conversations {
                     content: "yes".to_string(),
                 }],
             );
-            let history = get_history(user.clone());
+            let history = get_history(&user);
             assert!(history.is_empty());
-            let history = get_history(Principal::anonymous());
+            let history = get_history(&Principal::anonymous());
             assert_eq!(history.get(0).unwrap().content, "yes");
 
             clear_history();

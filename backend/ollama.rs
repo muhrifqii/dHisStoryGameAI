@@ -2,7 +2,7 @@
 
 use std::fmt::Display;
 
-use candid::{ser::TypeSerialize, CandidType, Principal};
+use candid::{CandidType, Principal};
 #[cfg(any(not(test), rust_analyzer))]
 use ic_cdk::call;
 use ic_llm::Model;
