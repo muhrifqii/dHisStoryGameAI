@@ -39,3 +39,6 @@ Thumbs.db
 
 # Coverage
 coverage/
+
+# dfx temporary files
+.dfx/
