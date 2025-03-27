@@ -1,14 +1,21 @@
 # dHisStoryGame.AI
 
+> [!IMPORTANT]
+> This project depends on `ic_llm`, but in version `0.3.0` it does not have **assistant** role. The `0.3.0` version should be marked as incomplete since it is critical to have **assistant** role for a fine-tuned context-aware LLM model. This project will use a workaround to handle the missing **assistant** role type of message from `ic_llm 0.3.0`. Learn more about the difference between system & assistant message here: [openAI forum](https://community.openai.com/t/what-exactly-does-a-system-msg-do/459409/2)
+
 ## How It Works
 
 ### Initial Prompt
 
 When a guest clicks "Start", the frontend sends an initial prompt to the backend. This prompt combines a system message with an introductory narrative asking the user to describe themselves (real character or not, and the preferred location).
 
-### Conversation Continuation
+### Conversation Continuation (Original Design)
 
 Each subsequent user message is combined with that user’s conversation history (retrieved by their Principal). If the history grows beyond a set threshold, a summarization routine is invoked to compress the conversation context and the token count. The full prompt (system message + history + new message) is then sent to the LLM.
+
+### Conversation Continuation (Workaround `ic_llm v0.3.0`)
+
+Each pair of user message and LLM's response is combined with that user's conversation history (retrieved by their Principal). If the history grows beyond a set threshold, a summarization routine is invoked to compress the conversation context and token count. The full prompt (system message combined with history + new message) is then sent to the LLM.
 
 ### LLM Response
 
@@ -22,10 +29,7 @@ Conversation histories are maintained in-memory per user using a global HashMap 
 
 The `/backend` folder contains the Rust smart contract:
 
-- `Cargo.toml`, which defines the crate that will form the backend
 - `lib.rs`, which contains the smart contract and llm, and exports its interface
-- `ollama.rs`, which handle the llm specific functions and entities related to it
-- `service.rs`, which contains the business logic of the ai agent
 
 The `/frontend` folder contains web assets for the application's user interface. The user interface is written using the React framework.
 
@@ -117,6 +121,7 @@ Your project will be hosted on your local machine. The local canister URLs for y
 
 This project meant to be able to be deployed on to [icp.ninja](https://icp.ninja). At the time this project is written, there's a couple **constraint** from current [icp.ninja](https://icp.ninja) version:
 
+- `ic_llm` on the base sample project is using version `0.3.0` which does not consit of `Role::Assistant`. Thus this project wont work as the original plan and used some workaround because of it, unless using the `0.4.0` or any latest version.
 - `Cargo.toml` and `package.json` are both locked, preventing the project to adopt more crates/package that is not added from the base sample project.
 - Folder cannot be added.
 - `dfx.json` also locked, preventing the project to add more canister other than the base sample project used. in this case, the project cannot use **Internet Identity**.
