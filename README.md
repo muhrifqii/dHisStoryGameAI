@@ -1,7 +1,21 @@
 # dHisStoryGame.AI
 
 > [!IMPORTANT]
-> This project depends on `ic_llm`, but in version `0.3.0` it does not have **assistant** role. The `0.3.0` version should be marked as incomplete since it is critical to have **assistant** role for a fine-tuned context-aware LLM model. This project will use a workaround to handle the missing **assistant** role type of message from `ic_llm 0.3.0`. Learn more about the difference between system & assistant message here: [openAI forum](https://community.openai.com/t/what-exactly-does-a-system-msg-do/459409/2)
+> This project depends on `ic_llm`, but in version `0.3.0` it does not have **assistant** role. This project will use a workaround to handle the missing **assistant** role type of message from `ic_llm 0.3.0`. Learn more about the difference between system & assistant message here: [openAI forum](https://community.openai.com/t/what-exactly-does-a-system-msg-do/459409/2)
+
+## Features
+
+- **Interactive Narrative:**  
+  Experience an immersive, branching story set in historical locations. Your decisions guide the narrative, with each turn presenting creative options.
+
+- **Dynamic Story Generation:**  
+  Leverages Llama 3.1:8B with a detailed system prompt that directs vivid, immersive storytelling. Narrative choices are presented as bullet-pointed options, and users can even propose creative alternatives.
+
+- **User-Specific Context:**  
+  Each guest’s conversation history is stored in-memory (keyed by their unique Principal), ensuring personalized context without mixing different users' data.
+
+- **Automatic Summarization:**  
+  To keep token usage in check, long conversation histories are periodically summarized, retaining the key decisions and context while reducing prompt size.
 
 ## How It Works
 

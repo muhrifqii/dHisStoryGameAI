@@ -27,12 +27,14 @@ const App = () => {
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isStarted, setIsStarted] = useState(false)
+  const [toast, setToast] = useState(undefined)
   const chatBoxRef = useRef(null)
 
-  const formatDate = date => {
-    const h = '0' + date.getHours()
-    const m = '0' + date.getMinutes()
-    return `${h.slice(-2)}:${m.slice(-2)}`
+  const showToast = message => {
+    setToast(message)
+    setTimeout(() => {
+      setToast(undefined)
+    }, 2000)
   }
 
   const replaceLatestChatWithResponse = response => {
@@ -115,8 +117,14 @@ const App = () => {
 
     if (action === 'copy') {
       const message = chat[messageIndex]
-      if (message && message.role === 'assistant') {
-        navigator.clipboard.writeText(message.content)
+      if (message) {
+        try {
+          await navigator.clipboard.writeText(message.content)
+          showToast('Copied to clipboard!')
+        } catch (err) {
+          console.error('Failed to copy text to clipboard:', err)
+          alert('Failed to copy text. Please try again.')
+        }
       }
     }
   }
@@ -129,6 +137,11 @@ const App = () => {
 
   return (
     <div className='flex flex-col h-full w-full overflow-hidden'>
+      {toast && (
+        <div className='fixed bottom-40 left-1/2 transform -translate-x-1/2 bg-secondary text-white px-4 py-2 rounded shadow-lg z-50'>
+          {toast}
+        </div>
+      )}
       <div className='flex flex-col relative w-full h-full'>
         <div className='draggable no-draggable-children sticky top-0 p-3 flex items-center justify-center z-10 pointer-events-none select-none'>
           <div className='flex items-center gap-0 overflow-hidden'>
