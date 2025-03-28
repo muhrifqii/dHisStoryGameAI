@@ -1,4 +1,7 @@
-# dHisStoryGame.AI
+# [dHisStoryGame.AI](https://github.com/muhrifqii/dHisStoryGameAI)
+
+[![codecov](https://codecov.io/gh/muhrifqii/dHisStoryGameAI/graph/badge.svg?token=0XBVFD0Y61)](https://codecov.io/gh/muhrifqii/dHisStoryGameAI)
+[![License](https://img.shields.io/github/license/muhrifqii/dHisStoryGameAI)](https://github.com/muhrifqii/dHisStoryGameAI/blob/master/LICENSE)
 
 > [!IMPORTANT]
 > This project depends on `ic_llm`, but in version `0.3.0` it does not have **assistant** role. This project will use a workaround to handle the missing **assistant** role type of message from `ic_llm 0.3.0`. Learn more about the difference between system & assistant message here: [openAI forum](https://community.openai.com/t/what-exactly-does-a-system-msg-do/459409/2)
@@ -56,7 +59,7 @@ To build the project locally, follow these steps.
 ### 1. Clone the repository
 
 ```sh
-git clone git@github.com:muhrifqii/ICV.git
+git clone git@github.com:muhrifqii/dHisStoryGameAI.git
 ```
 
 ### 2. Setting up Ollama
@@ -135,10 +138,9 @@ Your project will be hosted on your local machine. The local canister URLs for y
 
 This project meant to be able to be deployed on to [icp.ninja](https://icp.ninja). At the time this project is written, there's a couple **constraint** from current [icp.ninja](https://icp.ninja) version:
 
-- `ic_llm` on the base sample project is using version `0.3.0` which does not consit of `Role::Assistant`. Thus this project wont work as the original plan and used some workaround because of it, unless using the `0.4.0` or any latest version.
+- `ic_llm` on the base sample project is using version `0.3.0` which does not consit of `Role::Assistant`. Thus this project will not work as the original plan and requires to use some workaround, unless using the `0.4.0` or any latest version.
 - `Cargo.toml` and `package.json` are both locked, preventing the project to adopt more crates/package that is not added from the base sample project.
 - Folder cannot be added.
 - `dfx.json` also locked, preventing the project to add more canister other than the base sample project used. in this case, the project cannot use **Internet Identity**.
-- Rust file cannot be added.
 
 Once any of those limitations are resolved on ICP ninja, we can also lift them from this project and make more enhancements.
