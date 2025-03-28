@@ -13,6 +13,7 @@ import {
   Copy,
   ChatBubbleAction
 } from './components'
+import botImg from '/bot.svg'
 
 const ChatActions = [
   {
@@ -22,14 +23,7 @@ const ChatActions = [
 ]
 
 const App = () => {
-  const [chat, setChat] = useState([
-    { role: { assistant: null }, content: 'hello world' },
-    {
-      role: { user: null },
-      content:
-        'lorem ipsum lakjf asokdf jaosdif jaosdf joaskdjf oa jfoiasjo ajsodi jfaiosd jfoasid jfasodif jaosidj\n\nafjsdljf'
-    }
-  ])
+  const [chat, setChat] = useState([])
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isStarted, setIsStarted] = useState(false)
@@ -120,9 +114,25 @@ const App = () => {
   return (
     <div className='flex flex-col h-full w-full overflow-hidden'>
       <div className='flex flex-col relative w-full h-full'>
-        <div className='sticky'>header</div>
+        <div className='draggable no-draggable-children sticky top-0 p-3 flex items-center justify-center z-10 pointer-events-none select-none'>
+          <div className='flex items-center gap-0 overflow-hidden'>
+            {!isStarted && chat.length === 0 ? (
+              <h1 className='md:text-5xl text-4xl font-bold [@media(max-height:600px)]:my-4 md:my-40 my-12'>
+                dHisStoryGame.AI
+              </h1>
+            ) : (
+              <h1 className='text-3xl font-bold'>dHisStoryGame.AI</h1>
+            )}
+          </div>
+        </div>
         <div className='flex flex-col w-full h-full p-4 overflow-y-auto'>
           <div className='flex flex-col gap-6'>
+            {!isStarted && chat.length === 0 && (
+              <div
+                className='flex rounded-full h-56 w-56 self-center my-12'
+                style={{ backgroundImage: `url(${botImg})`, backgroundSize: 'cover' }}
+              ></div>
+            )}
             {chat.map((message, index) => {
               const variant = 'user' in message.role ? 'sent' : 'received'
               return (
@@ -146,10 +156,20 @@ const App = () => {
             })}
           </div>
         </div>
-        {!isStarted && (
-          <div className='w-full px-4 pb-4 relative'>
-            <div className='mx-auto flex flex-1 gap-4 md:gap-5 lg:gap-6 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem]'>
-              <div className='relative z-[1] flex max-w-full flex-1 flex-col h-full'>
+        <div className='w-full px-4 pb-4 relative'>
+          <div className='mx-auto flex flex-1 gap-4 md:gap-5 lg:gap-6 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem]'>
+            <div className='relative z-[1] flex max-w-full flex-1 flex-col h-full'>
+              {!isStarted && (
+                <div className='flex rounded-lg bg-muted min-h-16 p-3 w-full justify-center gap-10'>
+                  <Button size='xl' onClick={() => handleCmd('/start')} disabled={isLoading}>
+                    Start
+                  </Button>
+                  <Button size='xl' variant='outline' onClick={() => handleCmd('/about')} disabled={isLoading}>
+                    About
+                  </Button>
+                </div>
+              )}
+              {isStarted && (
                 <form
                   className='relative rounded-lg border bg-muted focus-within:ring-1 focus-within:ring-ring py-3 pl-3'
                   onSubmit={handleSubmit}
@@ -168,10 +188,10 @@ const App = () => {
                     </Button>
                   </div>
                 </form>
-              </div>
+              )}
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   )
