@@ -190,6 +190,14 @@ export function ChatBubble({ variant, children, ...props }) {
 export function ChatBubbleMessage({ className, variant, isLoading = false, children, ...props }) {
   const selVariant = variant ?? chatBubbleMessageVariants.defaultVariants.variant
   const clsVariant = chatBubbleMessageVariants.variants.variant[selVariant]
+  const transformUrlsToLinks = text => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g
+    return text.replace(urlRegex, url => {
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-500 underline">${url}</a>`
+    })
+  }
+  const content = typeof children === 'string' && !isLoading ? transformUrlsToLinks(children) : children
+
   return (
     <div className={`p-4 break-words max-w-full whitespace-pre-wrap ${clsVariant} ${className}`} {...props}>
       {isLoading ? (
@@ -197,7 +205,7 @@ export function ChatBubbleMessage({ className, variant, isLoading = false, child
           <MessageLoading />
         </div>
       ) : (
-        children
+        <span dangerouslySetInnerHTML={{ __html: content }} />
       )}
     </div>
   )

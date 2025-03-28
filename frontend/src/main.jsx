@@ -35,17 +35,21 @@ const App = () => {
     return `${h.slice(-2)}:${m.slice(-2)}`
   }
 
-  const askAgent = async input => {
+  const replaceLatestChatWithResponse = response => {
+    setChat(prevChat => {
+      const newChat = [...prevChat]
+      newChat.pop()
+      newChat.push({ role: { assistant: null }, content: response })
+      return newChat
+    })
+  }
+
+  const askAgent = async (input, onSuccess = replaceLatestChatWithResponse) => {
     try {
       const response = await backend.prompt(input)
-      setChat(prevChat => {
-        const newChat = [...prevChat]
-        newChat.pop()
-        newChat.push({ role: { assistant: null }, content: response })
-        return newChat
-      })
+      onSuccess(response)
     } catch (e) {
-      console.error(e)
+      console.log(e)
       const eStr = String(e)
       const match = eStr.match(/(SysTransient|CanisterReject), \\+"([^\\"]+)/)
       if (match) {
@@ -53,7 +57,7 @@ const App = () => {
       }
       setChat(prevChat => {
         const newChat = [...prevChat]
-        newChat.pop()
+        if (newChat.length > 0 && newChat[newChat.length - 1].loading) newChat.pop()
         return newChat
       })
     } finally {
@@ -87,9 +91,21 @@ const App = () => {
   }
 
   const handleCmd = cmd => {
+    const thinkingMessage = {
+      role: { assistant: null },
+      content: 'Thinking',
+      loading: true
+    }
     if (cmd === '/start') {
-      askAgent(cmd)
+      setChat(prevChat => [...prevChat, thinkingMessage])
+      setIsLoading(true)
+      askAgent(cmd, response => {
+        setChat([{ role: { assistant: null }, content: response }])
+        setIsStarted(true)
+      })
     } else if (cmd === '/about') {
+      setChat(prevChat => [...prevChat, thinkingMessage])
+      setIsLoading(true)
       askAgent(cmd)
     }
   }
@@ -147,7 +163,7 @@ const App = () => {
                         className='size-7'
                         key={type}
                         icon={<Icon className='size-4' />}
-                        onClick={() => console.log('Action ' + type + ' clicked for message ' + index)}
+                        onClick={() => handleActionClick(type, index)}
                       />
                     ))}
                   </ChatBubbleActionWrapper>
@@ -160,11 +176,17 @@ const App = () => {
           <div className='mx-auto flex flex-1 gap-4 md:gap-5 lg:gap-6 md:max-w-3xl lg:max-w-[40rem] xl:max-w-[48rem]'>
             <div className='relative z-[1] flex max-w-full flex-1 flex-col h-full'>
               {!isStarted && (
-                <div className='flex rounded-lg bg-muted min-h-16 p-3 w-full justify-center gap-10'>
+                <div className='flex rounded-lg bg-muted/70 min-h-16 p-3 w-full justify-center gap-10'>
                   <Button size='xl' onClick={() => handleCmd('/start')} disabled={isLoading}>
                     Start
                   </Button>
-                  <Button size='xl' variant='outline' onClick={() => handleCmd('/about')} disabled={isLoading}>
+                  <Button
+                    size='xl'
+                    variant='secondary'
+                    onClick={() => handleCmd('/about')}
+                    disabled={isLoading}
+                    className='bg-slate-700'
+                  >
                     About
                   </Button>
                 </div>
