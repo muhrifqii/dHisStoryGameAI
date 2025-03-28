@@ -6,6 +6,8 @@
 > [!IMPORTANT]
 > This project depends on `ic_llm`, but in version `0.3.0` it does not have **assistant** role. This project will use a workaround to handle the missing **assistant** role type of message from `ic_llm 0.3.0`. Learn more about the difference between system & assistant message here: [openAI forum](https://community.openai.com/t/what-exactly-does-a-system-msg-do/459409/2)
 
+https://github.com/user-attachments/assets/ee101d2e-5acf-45e5-9fef-2c74d19d5d1f
+
 ## Features
 
 - **Interactive Narrative:**  
