@@ -17,6 +17,7 @@ node_modules/
 
 # Vite build output
 /dist/
+frontend/dist
 
 # Logs
 npm-debug.log*
@@ -42,3 +43,5 @@ coverage/
 
 # dfx temporary files
 .dfx/
+
+src/declarations
