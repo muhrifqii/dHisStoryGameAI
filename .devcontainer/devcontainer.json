@@ -1,6 +1,6 @@
 {
   "name": "ICP Dev Environment",
-  "image": "ghcr.io/dfinity/icp-dev-env-slim:17",
+  "build": { "dockerfile": "Dockerfile" },
   "forwardPorts": [4943, 5173],
   "portsAttributes": {
     "4943": {
@@ -14,7 +14,24 @@
   },
   "customizations": {
     "vscode": {
-      "extensions": ["dfinity-foundation.vscode-motoko"]
+      "extensions": [
+        "bradlc.vscode-tailwindcss",
+        "jock.svg",
+        "rust-lang.rust-analyzer",
+        "esbenp.prettier-vscode",
+        "bierner.markdown-mermaid",
+        "xabikos.JavaScriptSnippets",
+        "VisualStudioExptTeam.vscodeintellicode",
+        "tamasfe.even-better-toml",
+        "dbaeumer.vscode-eslint",
+        "dsznajder.es7-react-js-snippets",
+        "EditorConfig.EditorConfig",
+        "fill-labs.dependi",
+        "ryanluker.vscode-coverage-gutters",
+        "vadimcn.vscode-lldb",
+        "formulahendry.code-runner",
+        "pustelto.bracketeer"
+      ]
     }
   }
 }
